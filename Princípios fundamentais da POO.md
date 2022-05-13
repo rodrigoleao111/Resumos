@@ -26,4 +26,3 @@ Exemplo: Você interage com seu telefone usando apenas alguns botões. O que est
 Traz um modo de usar uma _classe filha_ da mesma forma que usamos uma _classe pai_, aonde cada _filha_ pode implementar sua própria versão de um método herdado. 
 
 Na prática, é a reescrita de um método herdado de uma classe, sem utilizar **nenhum** comportamento da _classe pai_ para este método.
-

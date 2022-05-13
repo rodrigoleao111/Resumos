@@ -1,12 +1,6 @@
 # Resumo Java
 
-## Sumário: 
-
-- Estruturas macro: [Classe, Método e Modificadores de acesso](#Declaração de Classe, Método e Modificadores de Acesso)
-- Estruturas de condição: [If-else](#If - else), [Switch-case](#Switch - case), 
-- Estruturas de repetição: [while](#while), [do-while](#do-while), [for](#for), 
-- Comentários: [Javadoc](#Javadoc), 
-- Orientação Objeto: [herança](#herança).
+[TOC]
 
 
 
@@ -40,7 +34,11 @@ public class Pedido{		// O termo "public" informa que a classe é pública
 }
 ```
 
-## If - else
+
+
+## Estruturas condicionais
+
+### If - else
 
 ```java
 int valor = 80;
@@ -49,11 +47,9 @@ if(valor < 100){
 } else {
     valor += 50;
 }
-
-
 ```
 
-## Switch - case
+### Switch-case
 
 ```java
 int valor;
@@ -67,7 +63,11 @@ switch (valor){
 }
 ```
 
-## while
+
+
+## Estruturas de Repetição
+
+### While
 
 ```java
 while(condicaoVerdadeira){
@@ -75,7 +75,7 @@ while(condicaoVerdadeira){
 }
 ```
 
-## do-while
+### Do-while
 
 ```java
 //dessa forma é garantido que o bloco de código será executado ao menos uma vez
@@ -84,7 +84,7 @@ do {
 } while(condicaoVerdadeira)
 ```
 
-## for
+### For
 
 ```java
 //for(inicialização, condição, incremento)
@@ -99,9 +99,11 @@ for(String i : items){	// i assume o valor contido dentro da lista items.
 }
 ```
 
+
+
 ## Javadoc
 
-### Tags:
+### Tags
 
 - @author - especifica o autor da classe ou método
 - @deprecated - classe ou método obsoleto
@@ -121,7 +123,11 @@ for(String i : items){	// i assume o valor contido dentro da lista items.
 */
 ```
 
-## herança
+
+
+## Programaçaõ Orientada a Objetos
+
+### Herança
 
 ```java
 public class Pai {		//CLASSE PAI
@@ -153,4 +159,5 @@ public class Filha extends Pai {	//CLASSE FILHA - absorve os atributos e método
 }
 ```
 
-## 
+### Polimorfismo
+
