@@ -1,8 +1,12 @@
 # Resumo Python
 
-Tópicos: [if](#if), [if-inline](#if-inline), [while](#while), [for](#for), [list](#list), [dict](#dict), [tuple](#tuple), [function](#function), [POO](#POO), [files](#files).
+[TOC]
 
-## if
+
+
+## Estruturas condicionais
+
+### If-else
 
 ```python
 frutas = ["banana", "maça", "uva"]
@@ -16,7 +20,7 @@ else:
 # Resultado = Tem banana
 ```
 
-## if-inline
+### If inline
 
 ```python
 a = 100
@@ -24,7 +28,11 @@ b = True
 print a if b else 0
 ```
 
-## while
+
+
+## Estruturas de repetiçao
+
+### While
 
 ```python
 lista = []
@@ -38,7 +46,7 @@ while True:
 		lista.append(n)
 ```
 
-## for
+### For
 
 ```python
 for numero in lista:
@@ -51,7 +59,11 @@ for i in range(5):
 
 Para mais informações sobre estruturas báscas, [clique aqui](https://grand-citron-0fc.notion.site/Conceitos-B-sicos-6e8639100e6b4102af680ede40f4f41c).
 
-## list
+
+
+## Coleções
+
+### Lista
 
 ```python
 lista = [0, 1, 2, 3, 4]
@@ -71,7 +83,7 @@ print(lista[0:-1]) # [0, 1, 2, 3]
 
 Para mais informações sobre listas e suas funções, [clique aqui](https://grand-citron-0fc.notion.site/Listas-937600778f35412b8e50faeabe12b8f5).
 
-## dict
+### Dicionário
 
 ```python
 # nome = {'chave':valor}
@@ -80,7 +92,7 @@ dicionario = {'chaveInt': 1, 'chaveList':["item1", "item2"], 'chaveChar':'a'}
 
 Para mais informações sobre dicionários e seus métodos, [clique aqui](https://grand-citron-0fc.notion.site/Dicion-rios-d1bf578adec94dbd8ed9a08be252d6f0).
 
-## tuple
+### Tupla
 
 ```python
 //valores imutáveis
@@ -90,7 +102,9 @@ print(tupla[1]) # 20
 
 Para mais informações sobre tuplas e seus métodos, [clique aqui](https://grand-citron-0fc.notion.site/Tuplas-d223442137cf4703937befbb720fbe88).
 
-## function
+
+
+## Métodos (funções)
 
 ```python
 def media(num1, num2):
@@ -102,7 +116,11 @@ n2 = float(input("Insira a segunda nota: "))
 print(f"A média dos números é {media}")
 ```
 
-## POO
+
+
+## Programação Orientada a Objeto
+
+### Classes
 
 ```python
 class Pessoa:		# inicialização de classe
@@ -151,7 +169,9 @@ if __name__ == "__main__":		# controle de escopo de execução
 - Entenda o `if __name__ == "__main__":`  [aqui](https://www.alura.com.br/artigos/o-que-significa-if-name-main-no-python).
 - Para mais informações sobre orientação a objeto em python, [clique aqui](https://www.treinaweb.com.br/blog/orientacao-a-objetos-em-python).
 
-## files
+
+
+## Manipulação de arquivos
 
 ```python
 
