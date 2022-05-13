@@ -42,7 +42,7 @@ _Estou usando o Windows e o Git Bash._
 
 ## Roteiro para atualizar repositório remoto (Push)
 
-1. Envie as atualizações do projeto local para o GitHub com o comando: ` git push origin master`
+1. Envie as atualizações do projeto local para o GitHub com o comando: ` git push origin main`
 2. 
 
 ## Roteiro para atualizar repositório local (Clone / Pull)
