@@ -22,6 +22,28 @@ String nome = edtNome.getText().toString();
 
 
 
+## Atribuir uma função a um botão
+
+```java
+// No XML:
+<?xml version="1.0" encoding="utf-8"?>
+<Button xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/button_send"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="@string/button_send"
+    android:onClick="sendMessage" />  // <----- ATIVAR MÉTODO QUANDO CLICADO
+```
+
+```java
+// Na classe que hospeda o botão:
+public void sendMessage(View view) {
+    // Insira aqui as ações que o botão irá executar
+}
+```
+
+
+
 ## Navegar entre Activities (e enviar dados via Bundle)
 
 ### Na Activity origem
@@ -115,7 +137,58 @@ private void getDeepChildOffset(final ViewGroup mainParent, final ViewParent par
 
 
 
-## Receber dados JSON
+## Requisição HTTP GET com Volley
+
+```java
+// Habilitar permissão de acesso a internet no AndroidManifest.xml
+<uses-permission android:name="android.permission.INTERNET" />
+```
+
+```java
+// No build.gradle (Module:...) inserir o Volley nas dependências
+dependencies {
+        ...
+        implementation 'com.android.volley:volley:1.2.1'
+    }
+```
+
+```java
+// Classe: destinada à realizar requisições
+// Atribuir uma textview à uma variável
+TextView textView = findViewById(R.id.text);
+
+// Inicialização de uma lista de requisições
+RequestQueue queue = Volley.newRequestQueue(this);
+
+// String contendo o endereço http
+String url = "http://www.google.com";
+
+// Requisitar uma string como resposta da url consultada
+// StringRequest -> Clase do volley, responsável por requisitar uma string
+// Parâmetros de construção: método de requisição, string url, response.listener e errorlistener
+StringRequest stringRequest = new StringRequest(
+    Request.Method.GET,
+    url,
+    new Response.Listener<String>() {
+        @Override
+        public void onResponse(String response) { // Método que irá receber a resposta da url
+            // Mostra os primeiros 500 caracteres da string requisitada
+            textView.setText("Response is: "+ response.substring(0,500));
+        }
+    }, new Response.ErrorListener() {
+        @Override
+        public void onErrorResponse(VolleyError error) {
+            // Caso a requisição não funcione, mostra um erro
+            textView.setText("That didn't work!");
+        }
+    });
+
+// Envia a solicitação, adicionada a requisição à lista de requisições
+queue.add(stringRequest);
+}
+```
+
+
 
 ## Enviar dados JSON
 
