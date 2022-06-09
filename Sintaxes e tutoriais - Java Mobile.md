@@ -188,7 +188,22 @@ queue.add(stringRequest);
 }
 ```
 
+## Acessar localização do usuário via GPS
 
+### Habilitar a API de localização como dependência no build.gradle(:app)
 
-## Enviar dados JSON
+```java
+dependencies {
+...
+implementation 'com.google.android.gms:play-services-location:19.0.1'
+}
+```
+
+### Adicionar permissões no manifest
+
+```java
+<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+<uses-permission android:name="android.permission.INTERNET"/>
+```
 
