@@ -12,7 +12,7 @@
 
 3. Ativar o ambiente
 
-   1. `source venv/Scripts/activate`
+   1. `source venv/Scripts/activate` (caso não reconheça o _source_, use `venv\Scripts\activate`)
 
    2. Obs.: caso dê problema de o arquivo não poder ser carregado![image-20220607152452532](C:\Users\Rodrigo Leão\AppData\Roaming\Typora\typora-user-images\image-20220607152452532.png)
 

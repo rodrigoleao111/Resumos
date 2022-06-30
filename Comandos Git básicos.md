@@ -38,15 +38,29 @@ _Estou usando o Windows e o Git Bash._
 3. Vincule o repositório local com o projeto do GitHub: `git remote add origin 'endereçoCopiado'`
 4. Insira sua senha
 5. Verificar se o endereço foi adicionado corretamente: `git remote show origin -n`
-6. **Caso algo dê errado**, utilize o seguinte comando para remover o vínculo: ` git remote rm`
+6. **Caso algo dê errado**, utilize o seguinte comando para remover o vínculo: ` git remote remove origin`
 
 ## Roteiro para atualizar repositório remoto (Push)
 
 1. Envie as atualizações do projeto local para o GitHub com o comando: ` git push origin main`
-2. 
 
 ## Roteiro para atualizar repositório local (Clone / Pull)
 
+1. No repositório do github, copie o endereço em **Code >> SSH**
+2. Para clonar os arquivos, use o comando: `git clone EnderecoSSHdoRepositorio`
+
+## Resolvendo conflitos de merge
+
+Quando um comando push for rejeitado (arquivo do repositório diferente do local), executar o seguinte roteiro:
+
+1.  `git pull origin main`
+2. Abrir o arquivo. O que estra entre o HEAD é a alteração local.
+3. Modificar o arquivo e deletar marcações
+4. Adicione o arquivo para versionamento `git add .`
+5. Faça um commit: `git commit -m "resolve conflitos"`
+6. Empurrar a versão atualizada: `git push origin main`
+
+## Colaborando em repositórios de terceiros
 
 
 
