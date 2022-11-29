@@ -2,7 +2,7 @@
 
 # Sintaxes e tutoriais - Java Mobile
 
-## Criar Toast
+## Toast
 
 ```java
 Toast.makeText(MainActivity.this, "Mensagem aqui", Toast.LENGTH_LONG).show();
@@ -11,11 +11,11 @@ Toast.makeText(MainActivity.this, "Mensagem aqui", Toast.LENGTH_LONG).show();
 
 
 
-## Atribuindo uma View como variável
+## View como variável
 
 ```java
-// nomeDaView = (TipoDaView) encontrarViewPeloID;
-edtNome = (EditText) findViewById(R.id.editTextPersonName);
+// nomeDaView = encontrarViewPeloID;
+EditText edtNome = findViewById(R.id.editTextPersonName);
 // (TipoVariável) nomeVariável = nomeDaView.(funções para pegar e converter dados)
 String nome = edtNome.getText().toString();
 ```
@@ -23,6 +23,8 @@ String nome = edtNome.getText().toString();
 
 
 ## Atribuir uma função a um botão
+
+### No XML:
 
 ```java
 // No XML:
@@ -42,6 +44,23 @@ public void sendMessage(View view) {
 }
 ```
 
+### No código:
+
+```java
+private Buttom bt_confirma;
+
+protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+ 		
+    bt_confirma.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Faz alguma coisa aqui...
+            }
+        });
+}
+```
+
 
 
 ## Navegar entre Activities (e enviar dados via Bundle)
@@ -49,7 +68,6 @@ public void sendMessage(View view) {
 ### Na Activity origem
 
 ```java
-// IR E ENVIAR DADOS PARA OUTRA ACTIVITY
 // Criar uma intenção  |  Parâmetros: (contexto, destino)
 Intent goCatalogActivity = new Intent(getApplicationContext(), Catalogo.class);
 // Enviar informações
@@ -188,6 +206,8 @@ queue.add(stringRequest);
 }
 ```
 
+
+
 ## Acessar localização do usuário via GPS
 
 ### Habilitar a API de localização como dependência no build.gradle(:app)
@@ -205,5 +225,456 @@ implementation 'com.google.android.gms:play-services-location:19.0.1'
 <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 <uses-permission android:name="android.permission.INTERNET"/>
+```
+
+
+
+## Coletando imagens
+
+### 1.Permissões no manifest
+
+```java
+<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+<uses-permission android:name="android.permission.CAMERA" />
+```
+
+### 2. Decidindo local e checando permissões
+
+```java
+private ImageView addFoto;	// Botão
+
+@Override
+protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+
+    // Adicionar imagem
+    addFoto.setOnClickListener(new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            showImagePicDialog();
+        }
+    });
+}
+
+public void showImagePicDialog() {
+    cameraPermission = new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE};
+    storagePermission = new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE};
+    String[] options = {"Câmera", "Galeria"};
+    AlertDialog.Builder builder = new AlertDialog.Builder(FormOSManutencaoCorretiva.this);
+    builder.setTitle("Selecione a fonte da imagem:");
+    builder.setItems(options, new DialogInterface.OnClickListener() {
+        @RequiresApi(api = Build.VERSION_CODES.M)
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+            if (which == 0) {
+                if (!checkCameraPermission()) {
+                    requestCameraPermission();
+                } else {
+                    Intent camera = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                    cameraResultLauncher.launch(camera);
+                }
+            } else if (which == 1) {
+                if (!checkStoragePermission()) {
+                    requestStoragePermission();
+                } else {
+                    mGetContent.launch("image/*");
+                }
+            }
+        }
+    });
+    builder.create().show();
+}
+
+// Checagem de permissão: armazenamento externo
+public Boolean checkStoragePermission() {
+    boolean result = ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) == (PackageManager.PERMISSION_GRANTED);
+    return result;
+}
+
+// Requisição de permissão: galeria
+@RequiresApi(api = Build.VERSION_CODES.M)
+private void requestStoragePermission() {
+    requestPermissions(storagePermission, STORAGE_REQUEST);
+}
+
+// Checagem de permissão: camera
+public Boolean checkCameraPermission() {
+    boolean result = ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.CAMERA) == (PackageManager.PERMISSION_GRANTED);
+    boolean result1 = ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) == (PackageManager.PERMISSION_GRANTED);
+    return result && result1;
+}
+
+// Requisição de permissão: camera
+@RequiresApi(api = Build.VERSION_CODES.M)
+private void requestCameraPermission() {
+    requestPermissions(cameraPermission, CAMERA_REQUEST);
+}
+```
+
+### 3. Da galeria
+
+```java
+// Coletar imagem da galeria
+ActivityResultLauncher<String> mGetContent = registerForActivityResult(
+    new ActivityResultContracts.GetContent(), new ActivityResultCallback<Uri>() {
+        @Override
+        public void onActivityResult(Uri result) {
+            Intent sendToCropImageActivity = new Intent(getApplicationContext(), CropImage.class);
+            sendToCropImageActivity.putExtra("uri", result);
+            sendToCropImageActivity.putExtra("call", 1);
+            sendToCropImageActivity.putExtra("source", 1);
+            sendToCropImageActivity.putExtras(ColetarInformacoes());
+            startActivity(sendToCropImageActivity);
+        }
+    });
+```
+
+### 4. Da câmera
+
+```java
+// Coletar imagem da camera
+ActivityResultLauncher<Intent> cameraResultLauncher = registerForActivityResult(
+    new ActivityResultContracts.StartActivityForResult(),
+    new ActivityResultCallback<ActivityResult>() {
+        @Override
+        public void onActivityResult(ActivityResult result) {
+            if (result.getResultCode() == Activity.RESULT_OK) {
+                Intent data = result.getData();
+                if (data != null) {		// Captura bem sucedida
+                    // ASSIM ESTOU MODIFICANDO A TUMBNAIL (ESTICANDO A IMAGEM)
+                    Bitmap cameraPic = (Bitmap)(data.getExtras().get("data"));
+                    Uri tempUri = ImageHelper.getUriFromTumbnailBitmap(getApplicationContext(), cameraPic);
+
+                    Intent sendToCropImageActivity = new Intent(getApplicationContext(), CropImage.class);
+                    sendToCropImageActivity.putExtra("uri", tempUri);
+                    sendToCropImageActivity.putExtra("call", 1);
+                    sendToCropImageActivity.putExtra("source", 1);
+                    sendToCropImageActivity.putExtras(ColetarInformacoes());
+                    startActivity(sendToCropImageActivity);
+                }
+            }
+        }
+    });
+```
+
+
+
+## Tratamento de imagens
+
+### Arredondar bordas de bitmap
+
+```java
+public static Bitmap getRoundedCornerBitmap(Bitmap bitmap, int pixels) {
+    Bitmap output = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), Config.ARGB_8888);
+    Canvas canvas = new Canvas(output);
+
+    final int color = 0xff424242;
+    final Paint paint = new Paint();
+    final Rect rect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
+    final RectF rectF = new RectF(rect);
+    final float roundPx = pixels;
+
+    paint.setAntiAlias(true);
+    canvas.drawARGB(0, 0, 0, 0);
+    paint.setColor(color);
+    canvas.drawRoundRect(rectF, roundPx, roundPx, paint);
+
+    paint.setXfermode(new PorterDuffXfermode(Mode.SRC_IN));
+    canvas.drawBitmap(bitmap, rect, rect, paint);
+
+    return output;
+}
+```
+
+### Recuperar Uri de tumbnail bitmap
+
+```java
+public static Uri getUriFromTumbnailBitmap(Context inContext, Bitmap inImage) {
+    Bitmap OutImage = Bitmap.createScaledBitmap(inImage, inImage.getWidth()*10, inImage.getHeight()*10,true);
+    String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), OutImage, "Title", null);
+    return Uri.parse(path);
+}
+```
+
+### Recuperar path de uma Uri
+
+```java
+public static String getRealPathFromURI(Uri uri, Context inContext) {
+    Cursor cursor = inContext.getContentResolver().query(uri, null, null, null, null);
+    cursor.moveToFirst();
+    int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
+    return cursor.getString(idx);
+}
+```
+
+### Bitmap >>> Byte Array
+
+```java
+public static byte[] getByteArrayFromBitmap(Bitmap bitmap){
+    ByteArrayOutputStream bos = new ByteArrayOutputStream();
+    bitmap.compress(Bitmap.CompressFormat.PNG, 100, bos);
+    bitmap.recycle();
+    return bos.toByteArray();
+}
+```
+
+### Recuperar bitmap de diferentes tipos
+
+```java
+bitmap = BitmapFactory.decodeByteArray(bitmapdata, 0, bitmapdata.length);	// Byte Array
+bitmap = MediaStore.Images.Media.getBitmap(getApplicationContext().getContentResolver(), uriBitmap);	// uri
+```
+
+
+
+## Salvar arquivo na memória
+
+### PDF (Criar e salvar)
+
+```java
+public void GerarPDF(Bundle coletarInformacoes, Bitmap bitmap) throws IOException {
+
+    // Chaves e informações
+    String[] infoColaborador = {"Nome", "RG", "CPF", "Setor", "Cargo", "Telefone", "E-mail"};
+    String[] infoEquipamento = {"Locação", "Equipamento", "Modelo", "ID"};
+    String[] infoManutencao = {"Diagnóstico", "Solução", "Peças trocadas", "Observações"};
+    String[] chavesColaborador = {"nome", "rg", "cpf", "setor", "cargo", "telefone", "email"};
+    String[] chavesEquipamento = {"locacao", "equipamento", "modelo", "equipID"};
+    String[] chavesManutencao = {"diagnostico", "solucao", "troca", "obs"};
+
+
+
+    // Inicialização do pdf
+    PdfDocument pdfRelatorio = new PdfDocument();
+    Paint myPaint = new Paint();
+
+    // Informações da página ----------------------------------------------------
+    int pageWidth = 2480, pageHeight = 3508;  // Tamanho A4
+    int y = 200, marginLeft = 115, center = pageWidth/2, marginRight = pageWidth-115,
+    verticalSpacing = 50, imageSize = 900;
+    float titleSize = 90.0f, subTitleSize = 70.0f, textSize = 40.0f, topcSize = 30.0f;
+    PdfDocument.PageInfo infoRelatorio = new PdfDocument.PageInfo.Builder(pageWidth, pageHeight, 1).create();
+    PdfDocument.Page pagRelatorio = pdfRelatorio.startPage(infoRelatorio);
+    Canvas canvas = pagRelatorio.getCanvas();
+
+    // Escrevendo na página ----------------------------------------------------
+    // Título
+    myPaint.setTextAlign(Paint.Align.CENTER);
+    myPaint.setTextSize(titleSize);
+    myPaint.setFakeBoldText(true);
+    y += 90;
+    canvas.drawText("Ordem de Serviço - " + coletarInformacoes.getString("formID"), center, y, myPaint);
+
+    // Subtítulo
+    myPaint.setTextSize(subTitleSize);
+    myPaint.setFakeBoldText(false);
+    myPaint.setColor(Color.rgb(112, 119, 119));
+    y += 90;
+    canvas.drawText("Manutenção corretiva", center, y, myPaint);
+
+    // Data de preenchimento
+    SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+    Date date = new Date();
+    y += 90;
+    myPaint.setTextSize(subTitleSize - 10.0f);
+    canvas.drawText(formatter.format(date), center, y, myPaint);
+
+    // Informações do usuário
+    myPaint.setTextAlign(Paint.Align.LEFT);
+    myPaint.setTextSize(topcSize);
+    y += 3*verticalSpacing;
+    canvas.drawText("Informações do colaborador", marginLeft, y, myPaint);
+
+    myPaint.setTextAlign(Paint.Align.LEFT);
+    myPaint.setTextSize(textSize);
+    myPaint.setColor(Color.BLACK);
+
+    y += verticalSpacing;
+    for (int i = 0; i < infoColaborador.length; i++) {
+        canvas.drawText(infoColaborador[i] + ":", marginLeft, y, myPaint);
+        canvas.drawText(coletarInformacoes.getString(chavesColaborador[i]), marginLeft + 200, y, myPaint);
+        y += verticalSpacing;
+    }
+
+    y += 3*verticalSpacing;
+
+    // Informações do equipamento
+    myPaint.setColor(Color.rgb(112, 119, 119));
+    myPaint.setTextAlign(Paint.Align.LEFT);
+    myPaint.setTextSize(topcSize);
+    canvas.drawText("Equipamento | Ativo", marginLeft, y, myPaint);
+
+    myPaint.setTextAlign(Paint.Align.LEFT);
+    myPaint.setTextSize(textSize);
+    myPaint.setColor(Color.BLACK);
+
+    y += verticalSpacing;
+
+    for (int i = 0; i < infoEquipamento.length; i++) {
+        canvas.drawText(infoEquipamento[i] + ":", marginLeft, y, myPaint);
+        canvas.drawText(coletarInformacoes.getString(chavesEquipamento[i]), marginLeft + 300, y, myPaint);
+        y += verticalSpacing;
+    }
+
+    y += 3*verticalSpacing;
+
+    // Informações de Manutenção
+    myPaint.setColor(Color.rgb(112, 119, 119));
+    myPaint.setTextAlign(Paint.Align.LEFT);
+    myPaint.setTextSize(topcSize);
+    canvas.drawText("Informações de Manutenção", marginLeft, y, myPaint);
+
+    myPaint.setTextAlign(Paint.Align.LEFT);
+    myPaint.setTextSize(textSize);
+    myPaint.setColor(Color.BLACK);
+
+    y += verticalSpacing;
+
+    for (int i = 0; i < infoManutencao.length; i++) {
+        canvas.drawText(infoManutencao[i] + ":", marginLeft, y, myPaint);
+        canvas.drawText(coletarInformacoes.getString(chavesManutencao[i]), marginLeft + 300, y, myPaint);
+        y += verticalSpacing;
+    }
+
+    y += 3*verticalSpacing;
+
+    // Imagem
+    if(bitmap != null){
+        Rect rectImage = new Rect( marginLeft, y, marginLeft+imageSize, y+imageSize);
+        canvas.drawBitmap(bitmap, null, rectImage, myPaint);
+        y += 2*verticalSpacing;
+    }
+
+    // Logo In Forma
+    Resources res = getResources();
+    Bitmap informaLogo = BitmapFactory.decodeResource(res, R.drawable.informalogopreto);
+    Rect rect = new Rect(
+        marginLeft,
+        pageHeight - informaLogo.getHeight() - marginLeft,
+        informaLogo.getWidth() + marginLeft,
+        pageHeight - marginLeft);
+    canvas.drawBitmap(informaLogo, null, rect, myPaint);
+
+    pdfRelatorio.finishPage(pagRelatorio);
+
+    // Construção do arquivo
+    String nomeArquivo = "OSManutencao_" + coletarInformacoes.getString("formID") + ".pdf";
+    File file = new File(UserInfo.getUserCredentials().getString("osPath"), nomeArquivo);
+    file.setWritable(true);
+
+    try {
+        FileOutputStream fos = new FileOutputStream(file);
+        pdfRelatorio.writeTo(fos);
+        fos.flush();
+        fos.close();
+        Toast.makeText(getApplicationContext(), "arquivo gerado", Toast.LENGTH_SHORT).show();
+        CompartilharRelatorio(file);
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
+
+    pdfRelatorio.close();
+}
+```
+
+### Imagem (Bitmap)
+
+```java
+// Construção do nome do arquivo
+java.util.Date date = new Date();
+String nomeArquivo = "DocShare-Image-" + userID + "-" + date.getTime() + ".png";
+File file = new File(UserInfo.getUserCredentials().getString("imagesPath"), nomeArquivo);
+
+// Criação do arquivo
+try {
+    file.createNewFile();
+} catch (IOException e) {
+    e.printStackTrace();
+}
+
+// Converter bitmap para byte array
+ByteArrayOutputStream bos = new ByteArrayOutputStream();
+finalBitmap.compress(Bitmap.CompressFormat.PNG, 0, bos);
+byte[] bitmapdata = bos.toByteArray();
+
+// Escrevendo no arquivo
+FileOutputStream fos = null;
+try {
+    fos = new FileOutputStream(file);
+    fos.write(bitmapdata);
+    fos.flush();
+    fos.close();
+    Toast.makeText(getApplicationContext(), "Imagem salva com sucesso", Toast.LENGTH_SHORT).show();
+} catch (IOException e) {
+    e.printStackTrace();
+}
+```
+
+
+
+## Compartilhando arquivos
+
+### 1. Criar aqruivo file_path.xml
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+    <external-path
+        name="all_paths"
+        path="." />
+</paths>
+
+```
+
+### 2. Adicionar no manifest  > application
+
+```xml
+<provider
+          android:name="androidx.core.content.FileProvider"
+          android:authorities="com.example.docshare.provider"
+          android:exported="false"
+          android:grantUriPermissions="true" >
+    <meta-data
+               android:name="android.support.FILE_PROVIDER_PATHS"
+               android:resource="@xml/file_path" />
+</provider>
+```
+
+### 3. Função compartilhar PDF
+
+```java
+public void CompartilharRelatorio(File file) {
+
+    Uri pathUri = FileProvider.getUriForFile(
+        getApplicationContext(),
+        "com.example.docshare.provider",
+        file);
+
+    if(file.exists()){
+        Intent intentShare = new Intent(Intent.ACTION_SEND);
+        intentShare.setType("application/pdf");
+        intentShare.putExtra(Intent.EXTRA_STREAM, Uri.parse(pathUri.toString()));
+        startActivity(Intent.createChooser(intentShare, "Compartilhar Ordem de Serviço"));
+    } else {
+        Toast.makeText(getApplicationContext(), "Arquivo não encontrado", Toast.LENGTH_SHORT).show();
+    }
+}
+```
+
+
+
+## Fragments
+
+```
+
+```
+
+
+
+## XLM - Atributos interessantes
+
+```xml
+
 ```
 
